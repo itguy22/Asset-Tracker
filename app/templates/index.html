@@ -8,8 +8,7 @@
 <h1>Your Assets</h1>
 <form method="POST">
     {{ form.hidden_tag() }}
-    <p>{{ form.name.label }}<br>{{ form.name(size=32) }}</p>
-    <p>{{ form.description.label }}<br>{{ form.description(size=32) }}</p>
+    <p>{{ form.username.label }}<br>{{ form.username(size=32) }}</p>
     <p>{{ form.submit() }}</p>
 </form>
 <ul>
