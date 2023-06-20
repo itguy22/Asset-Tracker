@@ -5,17 +5,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Your Assets</h1>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <p>{{ form.username.label }}<br>{{ form.username(size=32) }}</p>
-    <p>{{ form.submit() }}</p>
-</form>
-<ul>
-    {% for asset in assets %}
-    <li><a href="{{ url_for('asset', id=asset.id) }}">{{ asset.name }}</a></li>
+{% for company in companies %}
+    <h2>{{ company.name }}</h2>
+    <p>Assets:</p>
+    <ul>
+    {% for asset in company.assets %}
+        <li>{{ asset.name }}</li>
     {% endfor %}
-</ul>
+    </ul>
+{% endfor %}
+
 {% endblock %}
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
