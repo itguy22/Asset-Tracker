@@ -2,9 +2,9 @@ from flask import request
 from flask_login import login_required
 from app import db, bcrypt, login as login_manager
 from app.models import User, Company
-from app.forms import RegistrationForm, LoginForm
+from app.forms import RegistrationForm, LoginForm, AssetForm, CompanyForm
 from flask import render_template, url_for, flash, redirect
-from flask_login import login_user, current_user
+from flask_login import login_user, current_user, logout_user
 from sqlalchemy import or_
 
 @login_manager.user_loader
@@ -44,14 +44,26 @@ def configure_routes(app):
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
-            if user and user.check_password(form.password.data):
-                login_user(user, remember=form.remember.data)
-                print("User should be logged in and redirected.")
-                return redirect(url_for('home'))
-        else:
-            print("User could not be logged in.")
+            if user:
+                print(f"Found user: {user.username}")
+                if user.check_password(form.password.data):
+                    print("Password match.")
+                    login_user(user, remember=form.remember.data)
+                    print("User should be logged in and redirected.")
+                    return redirect(url_for('home'))
+                else:
+                    print("Password does not match.")
+            else:
+                print("No user found.")
             flash('Login Unsuccessful. Please check username and password', 'danger')
         return render_template('login.html', title='Login', form=form)
+    
+    @app.route('/logout')
+    @login_required
+    def logout():
+        logout_user()
+        return redirect(url_for('login'))
+
 
     
     @app.route('/home')
@@ -61,4 +73,30 @@ def configure_routes(app):
             return render_template('index.html', companies=companies)
         else:
             return redirect(url_for('login'))  # redirect to 'login' if the user is not authenticated
+        
+    @app.route("/new_company", methods=['GET', 'POST'])
+    @login_required
+    def new_company():
+        form = CompanyForm()  # Assumes you have a CompanyForm defined in forms.py
+        if form.validate_on_submit():
+            new_company = Company(name=form.name.data, address=form.address.data, phone=form.phone.data)
+            db.session.add(new_company)
+            db.session.commit()
+            flash('New company has been created!', 'success')
+            return redirect(url_for('home'))  # or redirect to any page you like
+        return render_template('new_company.html', title='New Company', form=form)
+
+
+    @app.route("/new_asset", methods=['GET', 'POST'])
+    @login_required
+    def new_asset():
+        form = AssetForm()
+        if form.validate_on_submit():
+            new_asset = Asset(name=form.name.data, description=form.description.data, location=form.location.data, ip_address=form.ip_address.data, serial_number=form.serial_number.data, service_tag=form.service_tag.data, company_id=form.company_id.data)  # Assuming your AssetForm includes a company_id field
+            db.session.add(new_asset)
+            db.session.commit()
+            flash('New asset has been added!', 'success')
+            return redirect(url_for('home'))  # or redirect to any page you like
+        return render_template('new_asset.html', title='New Asset', form=form)
+
 
