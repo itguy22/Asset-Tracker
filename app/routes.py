@@ -66,13 +66,14 @@ def configure_routes(app):
 
 
     
-    @app.route('/home')
+
+
+    @app.route('/')
     def home():
         if current_user.is_authenticated:
-            companies = Company.query.all()  # fetch all companies
-            return render_template('index.html', companies=companies)
-        else:
-            return redirect(url_for('login'))  # redirect to 'login' if the user is not authenticated
+            return redirect(url_for('index'))  # or whatever your main page for logged in users is
+        return render_template('home.html')
+
         
     @app.route("/new_company", methods=['GET', 'POST'])
     @login_required
