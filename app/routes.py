@@ -13,9 +13,18 @@ def load_user(user_id):
 
 def configure_routes(app):
 
-    @app.route('/')
-    def index():
+    @app.route("/dashboard")
+    @login_required
+    def dashboard():
         return render_template('index.html')
+
+
+    @app.route("/")
+    def home():
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))  # Redirect to the authenticated user's page
+        return render_template('home.html')  # Show the home page to unauthenticated users
+
 
 
     @app.route("/register", methods=['GET', 'POST'])
@@ -65,15 +74,6 @@ def configure_routes(app):
         return redirect(url_for('login'))
 
 
-    
-
-
-    @app.route('/')
-    def home():
-        if current_user.is_authenticated:
-            return redirect(url_for('index'))  # or whatever your main page for logged in users is
-        return render_template('home.html')
-
         
     @app.route("/new_company", methods=['GET', 'POST'])
     @login_required
@@ -81,8 +81,10 @@ def configure_routes(app):
         form = CompanyForm()  # Assumes you have a CompanyForm defined in forms.py
         if form.validate_on_submit():
             new_company = Company(name=form.name.data, address=form.address.data, phone=form.phone.data)
+            new_company.users.append(current_user)
             db.session.add(new_company)
             db.session.commit()
+
             flash('New company has been created!', 'success')
             return redirect(url_for('home'))  # or redirect to any page you like
         return render_template('new_company.html', title='New Company', form=form)
