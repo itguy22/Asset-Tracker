@@ -2,8 +2,8 @@ from flask import request
 from flask_login import login_required
 from app import db, bcrypt, login as login_manager
 from app.models import User, Company, Asset
-from app.forms import RegistrationForm, LoginForm, AssetForm, CompanyForm
-from flask import render_template, url_for, flash, redirect
+from app.forms import RegistrationForm, LoginForm, AssetForm, CompanyForm, EditCompanyForm, DeleteCompanyForm
+from flask import render_template, url_for, flash, redirect, abort
 from flask_login import login_user, current_user, logout_user
 from sqlalchemy import or_
 
@@ -101,5 +101,33 @@ def configure_routes(app):
             flash('New asset has been added!', 'success')
             return redirect(url_for('home'))  # or redirect to any page you like
         return render_template('new_asset.html', title='New Asset', form=form)
+    
+    @app.route('/edit_company/<int:company_id>', methods=['GET', 'POST'])
+    @login_required
+    def edit_company(company_id):
+        company = Company.query.get_or_404(company_id)
+        if company not in current_user.companies:
+            abort(403)
+        form = EditCompanyForm()
+        delete_form = DeleteCompanyForm()
+        if form.validate_on_submit():
+            company.name = form.name.data
+            company.address = form.address.data
+            company.phone = form.phone.data
+            db.session.commit()
+            flash('Your changes have been saved.')
+            return redirect(url_for('edit_company', company_id=company.id))
+        elif request.method == 'GET':
+            form.name.data = company.name
+            form.address.data = company.address
+            form.phone.data = company.phone
+        if delete_form.validate_on_submit():
+            db.session.delete(company)
+            db.session.commit()
+            flash('The company has been deleted.')
+            return redirect(url_for('home'))
+        return render_template('edit_company.html', title='Edit Company',
+                            form=form, delete_form=delete_form, company=company)
+
 
 

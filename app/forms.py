@@ -28,3 +28,13 @@ class CompanyForm(FlaskForm):
     address = StringField('Address', validators=[DataRequired()])
     phone = StringField('Phone', validators=[DataRequired()])
     submit = SubmitField('Create Company')
+
+class EditCompanyForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    address = StringField('Address', validators=[DataRequired()])
+    phone = StringField('Phone', validators=[DataRequired()])
+    submit = SubmitField('Update Company')
+
+    
+class DeleteCompanyForm(FlaskForm):
+    submit = SubmitField('Delete Company')
