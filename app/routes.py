@@ -1,7 +1,7 @@
 from flask import request
 from flask_login import login_required
 from app import db, bcrypt, login as login_manager
-from app.models import User, Company
+from app.models import User, Company, Asset
 from app.forms import RegistrationForm, LoginForm, AssetForm, CompanyForm
 from flask import render_template, url_for, flash, redirect
 from flask_login import login_user, current_user, logout_user
