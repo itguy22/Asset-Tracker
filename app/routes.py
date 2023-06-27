@@ -16,7 +16,8 @@ def configure_routes(app):
     @app.route("/dashboard")
     @login_required
     def dashboard():
-        return render_template('index.html')
+        companies = current_user.companies # Get the companies associated with the current user
+        return render_template('index.html', title='Dashboard', companies=companies)
 
 
     @app.route("/")
