@@ -109,26 +109,30 @@ def configure_routes(app):
         company = Company.query.get_or_404(company_id)
         if company not in current_user.companies:
             abort(403)
-        form = EditCompanyForm()
+
         delete_form = DeleteCompanyForm()
-        if form.validate_on_submit():
-            company.name = form.name.data
-            company.address = form.address.data
-            company.phone = form.phone.data
-            db.session.commit()
-            flash('Your changes have been saved.')
-            return redirect(url_for('edit_company', company_id=company.id))
-        elif request.method == 'GET':
-            form.name.data = company.name
-            form.address.data = company.address
-            form.phone.data = company.phone
+
+        if request.method == 'POST':
+            form = EditCompanyForm()
+            if form.validate_on_submit():
+                company.name = form.name.data
+                company.address = form.address.data
+                company.phone = form.phone.data
+                db.session.commit()
+                flash('Your changes have been saved.')
+                return redirect(url_for('edit_company', company_id=company.id))
+        else:
+            form = EditCompanyForm(obj=company)
+
         if delete_form.validate_on_submit():
             db.session.delete(company)
             db.session.commit()
             flash('The company has been deleted.')
             return redirect(url_for('home'))
+
         return render_template('edit_company.html', title='Edit Company',
                             form=form, delete_form=delete_form, company=company)
+
 
 
 
