@@ -81,6 +81,11 @@ def configure_routes(app):
     def new_company():
         form = CompanyForm()  # Assumes you have a CompanyForm defined in forms.py
         if form.validate_on_submit():
+            for company in current_user.companies:
+                if company.name == form.name.data:
+                    flash('You already have a company with this name.', 'danger')
+                    return redirect(url_for('new_company'))
+                    break  # breaks the loop as soon as a match is found
             new_company = Company(name=form.name.data, address=form.address.data, phone=form.phone.data)
             new_company.users.append(current_user)
             db.session.add(new_company)
@@ -107,23 +112,34 @@ def configure_routes(app):
     @login_required
     def edit_company(company_id):
         company = Company.query.get_or_404(company_id)
+        print(company.__dict__)  # For debugging purposes.
+
         if company not in current_user.companies:
             abort(403)
 
+        form = EditCompanyForm()
+
+        # For debugging purposes. Print the form data before and after assigning the company data to it.
+        print(f'Form data before assignment: Name - {form.name.data}, Address - {form.address.data}, Phone - {form.phone.data}')
+        
+        if request.method == 'GET':
+            form.name.data = company.name
+            form.address.data = company.address
+            form.phone.data = company.phone
+
+        print(f'Form data after assignment: Name - {form.name.data}, Address - {form.address.data}, Phone - {form.phone.data}')
+        # End of debugging block.
+
         delete_form = DeleteCompanyForm()
 
-        if request.method == 'POST':
-            form = EditCompanyForm()
-            if form.validate_on_submit():
-                company.name = form.name.data
-                company.address = form.address.data
-                company.phone = form.phone.data
-                db.session.commit()
-                flash('Your changes have been saved.')
-                return redirect(url_for('edit_company', company_id=company.id))
-        else:
-            form = EditCompanyForm(obj=company)
-
+        if form.validate_on_submit():
+            company.name = form.name.data
+            company.address = form.address.data
+            company.phone = form.phone.data
+            db.session.commit()
+            flash('Your changes have been saved.')
+            return redirect(url_for('home'))
+    
         if delete_form.validate_on_submit():
             db.session.delete(company)
             db.session.commit()
@@ -131,7 +147,8 @@ def configure_routes(app):
             return redirect(url_for('home'))
 
         return render_template('edit_company.html', title='Edit Company',
-                            form=form, delete_form=delete_form, company=company)
+                                form=form, delete_form=delete_form, company=company)
+
 
 
 

@@ -33,8 +33,7 @@ class User(UserMixin, db.Model):
 
 class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
+    name = db.Column(db.String(64))  # remove the unique=True constraint
     assets = db.relationship('Asset', backref='company', lazy='dynamic')  # A Company can have multiple Assets
     address = db.Column(db.String(128))
     phone = db.Column(db.String(64))
-
