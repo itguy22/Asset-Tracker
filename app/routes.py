@@ -149,6 +149,25 @@ def configure_routes(app):
         return render_template('edit_company.html', title='Edit Company',
                                 form=form, delete_form=delete_form, company=company)
 
+    @app.route("/company/<int:company_id>/assets", methods=['GET', 'POST'])
+    @login_required
+    def assets(company_id):
+        form = AssetForm()
+        company = Company.query.get_or_404(company_id)
+
+        if company not in current_user.companies:
+            abort(403)  # Forbidden, current user doesn't have access to this company
+
+        if form.validate_on_submit():
+            new_asset = Asset(name=form.name.data, ip_address=form.ip_address.data, serial_number=form.serial_number.data, service_tag=form.service_tag.data, location=form.location.data, company_id=company_id)
+            db.session.add(new_asset)
+            db.session.commit()
+            flash('New asset has been added!', 'success')
+            return redirect(url_for('assets', company_id=company_id))
+
+        assets = Asset.query.filter_by(company_id=company_id).all()
+        return render_template('assets.html', title='Assets', form=form, assets=assets, company=company)
+
 
 
 

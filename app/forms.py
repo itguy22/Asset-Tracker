@@ -11,8 +11,12 @@ class RegistrationForm(FlaskForm):
 
 class AssetForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    description = StringField('Description')
-    submit = SubmitField('Submit')
+    description = StringField('Description', validators=[DataRequired()])
+    ip_address = StringField('IP Address', validators=[DataRequired()])
+    serial_number = StringField('Serial Number', validators=[DataRequired()])
+    service_tag = StringField('Service Tag', validators=[DataRequired()])
+    location = StringField('Location', validators=[DataRequired()])
+    submit = SubmitField('Add Asset')
 
 class DeleteForm(FlaskForm):
     submit = SubmitField('Delete')
