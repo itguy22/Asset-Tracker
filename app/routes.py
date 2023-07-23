@@ -149,24 +149,73 @@ def configure_routes(app):
         return render_template('edit_company.html', title='Edit Company',
                                 form=form, delete_form=delete_form, company=company)
 
-    @app.route("/company/<int:company_id>/assets", methods=['GET', 'POST'])
+    @app.route('/company/<int:company_id>/assets', methods=['GET', 'POST'])
     @login_required
     def assets(company_id):
-        form = AssetForm()
+        # Fetch the company and its associated assets from the database
         company = Company.query.get_or_404(company_id)
+        if current_user not in company.users:
+            abort(403)  # If the user doesn't have access to this company, return a 403 error
+        assets = Asset.query.filter_by(company_id=company.id).all()
 
-        if company not in current_user.companies:
-            abort(403)  # Forbidden, current user doesn't have access to this company
-
+        form = AssetForm()
         if form.validate_on_submit():
-            new_asset = Asset(name=form.name.data, ip_address=form.ip_address.data, serial_number=form.serial_number.data, service_tag=form.service_tag.data, location=form.location.data, company_id=company_id)
+            new_asset = Asset(
+                name=form.name.data,
+                ip_address=form.ip_address.data,
+                serial_number=form.serial_number.data,
+                service_tag=form.service_tag.data,
+                location=form.location.data,
+                company_id=company.id
+            )
             db.session.add(new_asset)
             db.session.commit()
             flash('New asset has been added!', 'success')
+            return redirect(url_for('assets', company_id=company.id)) 
+
+        return render_template('assets.html', title='Assets', form=form, assets=assets, company=company)
+
+    @app.route('/company/<int:company_id>/asset/<int:asset_id>/update', methods=['GET', 'POST'])
+    @login_required
+    def update_asset(company_id, asset_id):
+        # Update asset logic here
+        # Fetch the asset and check if the user has permission to update it
+        asset = Asset.query.get_or_404(asset_id)
+        if asset.company_id != company_id:
+            abort(403)  # If the asset doesn't belong to the company, return a 403 error
+
+        form = AssetForm()
+        if form.validate_on_submit():
+            asset.name = form.name.data
+            asset.ip_address = form.ip_address.data
+            asset.serial_number = form.serial_number.data
+            asset.service_tag = form.service_tag.data
+            asset.location = form.location.data
+            db.session.commit()
+            flash('Asset has been updated!', 'success')
             return redirect(url_for('assets', company_id=company_id))
 
-        assets = Asset.query.filter_by(company_id=company_id).all()
-        return render_template('assets.html', title='Assets', form=form, assets=assets, company=company)
+        elif request.method == 'GET':
+            form.name.data = asset.name
+            form.ip_address.data = asset.ip_address
+            form.serial_number.data = asset.serial_number
+            form.service_tag.data = asset.service_tag
+            form.location.data = asset.location
+        return render_template('update_asset.html', title='Update Asset', form=form, company_id=company_id, asset_id=asset_id)
+
+    @app.route('/company/<int:company_id>/asset/<int:asset_id>/delete', methods=['POST'])
+    @login_required
+    def delete_asset(company_id, asset_id):
+        # Delete asset logic here
+        asset = Asset.query.get_or_404(asset_id)
+        if asset.company_id != company_id:
+            abort(403)  # If the asset doesn't belong to the company, return a 403 error
+
+        db.session.delete(asset)
+        db.session.commit()
+        flash('Asset has been deleted!', 'success')
+        return redirect(url_for('assets', company_id=company_id))
+
 
 
 
