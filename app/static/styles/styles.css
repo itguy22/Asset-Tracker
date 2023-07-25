@@ -1,9 +1,21 @@
 .btn-primary {
     background-color: #1D5B79 !important;
     border-color: #1D5B79 !important;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0E456A !important; /* Slightly darker blue */
+    border-color: #0E456A !important;
 }
 
 .btn-secondary {
     background-color: #468B97 !important;
     border-color: #468B97 !important;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #307882 !important; /* Slightly darker teal */
+    border-color: #307882 !important;
 }

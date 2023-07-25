@@ -5,6 +5,7 @@ from app.models import User, Company, Asset
 from app.forms import RegistrationForm, LoginForm, AssetForm, CompanyForm, EditCompanyForm, DeleteCompanyForm
 from flask import render_template, url_for, flash, redirect, abort
 from flask_login import login_user, current_user, logout_user
+from flask import current_app as app
 from sqlalchemy import or_
 
 @login_manager.user_loader
@@ -149,14 +150,27 @@ def configure_routes(app):
         return render_template('edit_company.html', title='Edit Company',
                                 form=form, delete_form=delete_form, company=company)
 
+
     @app.route('/company/<int:company_id>/assets', methods=['GET', 'POST'])
     @login_required
     def assets(company_id):
+        # Log the incoming company ID
+        app.logger.info('Accessing assets for company with id %s', company_id)
+
         # Fetch the company and its associated assets from the database
         company = Company.query.get_or_404(company_id)
+
+        # Log details about the company
+        app.logger.debug('Found company: %s', company.name)
+
         if current_user not in company.users:
+            app.logger.warning('User %s tried to access company %s without permission', current_user.id, company_id)
             abort(403)  # If the user doesn't have access to this company, return a 403 error
+
         assets = Asset.query.filter_by(company_id=company.id).all()
+
+        # Log the number of assets found
+        app.logger.debug('Found %s assets', len(assets))
 
         form = AssetForm()
         if form.validate_on_submit():
@@ -174,6 +188,7 @@ def configure_routes(app):
             return redirect(url_for('assets', company_id=company.id)) 
 
         return render_template('assets.html', title='Assets', form=form, assets=assets, company=company)
+
 
     @app.route('/company/<int:company_id>/asset/<int:asset_id>/update', methods=['GET', 'POST'])
     @login_required
