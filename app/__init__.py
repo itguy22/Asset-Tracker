@@ -23,3 +23,4 @@ login.login_view = 'login'  # The login route
 
 from app import routes, models
 routes.configure_routes(app)  # Call the function here
+print(app.config)
