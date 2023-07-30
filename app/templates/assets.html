@@ -1,37 +1,50 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ company.name }}'s Assets</h1>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.name.label(class="form-control-label") }}
-        {{ form.name(class="form-control form-control-lg") }}
+<h1 class="text-center">{{ company.name }}'s Assets</h1>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.name.label(class="form-control-label") }}
+                    {{ form.name(class="form-control form-control-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.ip_address.label(class="form-control-label") }}
+                    {{ form.ip_address(class="form-control form-control-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.serial_number.label(class="form-control-label") }}
+                    {{ form.serial_number(class="form-control form-control-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.service_tag.label(class="form-control-label") }}
+                    {{ form.service_tag(class="form-control form-control-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.location.label(class="form-control-label") }}
+                    {{ form.location(class="form-control form-control-lg") }}
+                </div>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        {{ form.ip_address.label(class="form-control-label") }}
-        {{ form.ip_address(class="form-control form-control-lg") }}
-    </div>
-    <div class="form-group">
-        {{ form.serial_number.label(class="form-control-label") }}
-        {{ form.serial_number(class="form-control form-control-lg") }}
-    </div>
-    <div class="form-group">
-        {{ form.service_tag.label(class="form-control-label") }}
-        {{ form.service_tag(class="form-control form-control-lg") }}
-    </div>
-    <div class="form-group">
-        {{ form.location.label(class="form-control-label") }}
-        {{ form.location(class="form-control form-control-lg") }}
-    </div>
-    {{ form.submit(class="btn btn-primary") }}
-</form>
+</div>
 
 <hr>
 
-<h2>Existing Assets</h2>
-{% for asset in assets %}
-<p>{{ asset.name }} - {{ asset.ip_address }} - {{ asset.serial_number }} - {{ asset.service_tag }} - {{ asset.location }}</p>
-{% endfor %}
+<div class="container">
+    <h2 class="text-center">Existing Assets</h2>
+    {% for asset in assets %}
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <p>{{ asset.name }} - {{ asset.ip_address }} - {{ asset.serial_number }} - {{ asset.service_tag }} - {{ asset.location }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
 {% endblock %}
