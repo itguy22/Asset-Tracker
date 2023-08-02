@@ -102,6 +102,7 @@ def configure_routes(app):
     def new_asset():
         form = AssetForm()
         if form.validate_on_submit():
+            app.logger.info('Form validated successfully.')
             new_asset = Asset(name=form.name.data, description=form.description.data, location=form.location.data, ip_address=form.ip_address.data, serial_number=form.serial_number.data, service_tag=form.service_tag.data, company_id=form.company_id.data)  # Assuming your AssetForm includes a company_id field
             db.session.add(new_asset)
             db.session.commit()
