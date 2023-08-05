@@ -13,6 +13,7 @@ class AssetForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     description = StringField('Description', validators=[DataRequired()])
     ip_address = StringField('IP Address', validators=[DataRequired()])
+    url = StringField('URL', validators=[DataRequired()])
     serial_number = StringField('Serial Number', validators=[DataRequired()])
     service_tag = StringField('Service Tag', validators=[DataRequired()])
     location = StringField('Location', validators=[DataRequired()])
