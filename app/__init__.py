@@ -13,7 +13,10 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config['DEBUG'] = True
 app.config['SECRET_KEY'] = os.environ.get('CSRF_SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+uri = os.environ.get('DATABASE_URL')
+if uri and uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
