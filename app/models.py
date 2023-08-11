@@ -14,6 +14,7 @@ class Asset(db.Model):
     description = db.Column(db.String(128))
     location = db.Column(db.String(64))
     ip_address= db.Column(db.String(64))
+    url = db.Column(db.String(256), nullable=True) 
     serial_number = db.Column(db.String(64))
     service_tag = db.Column(db.String(64))
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'))  # Assets belong to Companies

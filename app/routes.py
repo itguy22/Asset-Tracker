@@ -178,6 +178,7 @@ def configure_routes(app):
             new_asset = Asset(
                 name=form.name.data,
                 ip_address=form.ip_address.data,
+                url=form.url.data,
                 serial_number=form.serial_number.data,
                 service_tag=form.service_tag.data,
                 location=form.location.data,
