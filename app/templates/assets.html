@@ -3,6 +3,17 @@
 {% block content %}
 <h1 class="text-center">{{ company.name }}'s Assets</h1>
 
+<div class="form-group">
+    <label for="assetType" class="form-control-label">Asset Type</label>
+    <select id="assetType" name="assetType" class="form-control form-control-lg" onchange="displayFields()">
+        <option value="Server">Server</option>
+        <option value="PC">PC</option>
+        <option value="Phone">Phone</option>
+        <option value="Switch">Switch</option>
+    </select>
+</div>
+
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-6">
@@ -74,6 +85,33 @@
         </tbody>
     </table>
 </div>
+
+
+<script>
+function displayFields() {
+    var type = document.getElementById("assetType").value;
+
+    // List of all fields
+    var allFields = ["nameField", "ipField", "serialNumberField", "serviceTagField", "locationField"];
+    
+    // Hide all fields first
+    allFields.forEach(function(id) {
+        document.getElementById(id).style.display = 'none';
+    });
+
+    if (type === "Server") {
+        // Fields for the Server type
+        var serverFields = ["nameField", "ipField", "serialNumberField", "serviceTagField", "locationField"];
+        
+        serverFields.forEach(function(id) {
+            document.getElementById(id).style.display = 'block';
+        });
+    }
+    
+    // ... other conditions for other asset types...
+}
+
+</script>
 
 
 {% endblock %}
