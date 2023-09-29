@@ -1,6 +1,7 @@
 from app import db, login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.schema import CheckConstraint
 
 # This is the association table for the many-to-many relationship between User and Company.
 user_companies = db.Table('user_companies',
@@ -13,11 +14,41 @@ class Asset(db.Model):
     name = db.Column(db.String(64), unique=True)
     description = db.Column(db.String(128))
     location = db.Column(db.String(64))
-    ip_address= db.Column(db.String(64))
-    url = db.Column(db.String(256), nullable=True) 
+    
+    # Asset type field
+    asset_type = db.Column(db.String(50))  # Consider using db.Enum for stricter type checking
+    
+    # Common fields
+    ip_address = db.Column(db.String(64))
     serial_number = db.Column(db.String(64))
     service_tag = db.Column(db.String(64))
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))  # Assets belong to Companies
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+    
+    # Server-specific fields
+    server_ip_address = db.Column(db.String(64), nullable=True)
+    
+    # PC-specific fields
+    pc_ram = db.Column(db.Integer, nullable=True)
+    pc_processor = db.Column(db.String(255), nullable=True)
+    
+    # Phone-specific fields
+    phone_number = db.Column(db.String(15), nullable=True)
+    mac_address = db.Column(db.String(15), nullable=True)
+    
+    # Switch-specific fields
+    switch_ports = db.Column(db.Integer, nullable=True)
+    switch_poe = db.Column(db.Boolean, nullable=True)
+    
+    # Database-level validation
+    __table_args__ = (
+        CheckConstraint(
+            "(asset_type = 'Server' AND server_ip_address IS NOT NULL) OR "
+            "(asset_type = 'PC' AND pc_ram IS NOT NULL AND pc_processor IS NOT NULL) OR "
+            "(asset_type = 'Phone' AND phone_number IS NOT NULL) OR "
+            "(asset_type = 'Switch' AND switch_ports IS NOT NULL AND switch_poe IS NOT NULL)", 
+            name='valid_asset_data'
+        ),
+    )
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
