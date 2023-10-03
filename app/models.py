@@ -23,6 +23,7 @@ class Asset(db.Model):
     serial_number = db.Column(db.String(64))
     service_tag = db.Column(db.String(64))
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+    url = db.Column(db.String(128))
     
     # Server-specific fields
     server_ip_address = db.Column(db.String(64), nullable=True)
