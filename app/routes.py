@@ -6,6 +6,7 @@ from app.forms import RegistrationForm, LoginForm, AssetForm, CompanyForm, EditC
 from flask import render_template, url_for, flash, redirect, abort
 from flask_login import login_user, current_user, logout_user
 from flask import current_app as app
+from flask import jsonify
 from sqlalchemy import or_
 
 @login_manager.user_loader
@@ -231,7 +232,7 @@ def configure_routes(app):
         db.session.delete(asset)
         db.session.commit()
         flash('Asset has been deleted!', 'success')
-        return redirect(url_for('assets', company_id=company_id))
+        return jsonify(success=True)
 
 
 

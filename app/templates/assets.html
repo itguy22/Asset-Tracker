@@ -88,7 +88,7 @@
                     <td>{{ asset.serial_number }}</td>
                     <td>{{ asset.service_tag }}</td>
                     <td>{{ asset.location }}</td>
-                    <td><button class="delete-asset-btn" data-asset-name="{{ asset.name }}" data-asset-id="{{ asset.id }}">Delete</button></td>
+                    <td><button class="delete-asset-btn" data-asset-name="{{ asset.name }}" data-asset-id="{{ asset.id }}" data-company-id="{{ company.id }}">Delete</button></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -130,18 +130,41 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function(e) {
             const assetName = e.target.getAttribute('data-asset-name');
             const assetId = e.target.getAttribute('data-asset-id');
+            const companyId = e.target.getAttribute('data-company-id');
 
             // Confirm deletion
             const isConfirmed = confirm(`Are you sure you want to delete ${assetName}?`);
 
             if (isConfirmed) {
-                // Handle deletion: 
-                // You can make an AJAX request here, or simply navigate to a route that handles the delete.
-                window.location.href = `/company/${companyId}/asset/${assetId}/delete`; // Readjusted route. 
+                // Send a POST request to the delete endpoint
+                fetch(`/company/${companyId}/asset/${assetId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Include other necessary headers, such as CSRF tokens if you're using Flask-WTF
+                    },
+                    // body: JSON.stringify({ 'key': 'value' }) // if you need to send JSON data
+                })
+                .then(response => response.json()) // assuming server responds with json
+                .then(data => {
+                    // Handle server response here. Maybe refresh the page to show the asset has been deleted.
+                    if (data.success) {
+                        location.reload(); // this reloads the page
+                    } else {
+                        alert('Error deleting the asset.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the asset.');
+                });
             }
         });
     });
 });
+
+
+
 
 
 </script>
